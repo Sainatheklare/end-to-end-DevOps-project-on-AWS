@@ -1,0 +1,49 @@
+Architecture (high level)
+
+Code: GitHub (mono or multi-repo)
+
+CI/CD: GitHub Actions or Jenkins
+
+Registry: Amazon ECR
+
+IaC: Terraform (provision) + Ansible (post-provision bootstraps)
+
+Runtime: Docker + Amazon EKS (managed K8s)
+
+Deploy: Argo CD (GitOps) + Helm charts (dev/stage/prod)
+
+Ingress: AWS Load Balancer Controller → ALB
+
+Data: Amazon RDS (Postgres) / ElastiCache (optional)
+
+Logs: Fluent Bit → CloudWatch Logs
+
+Metrics/Tracing: Prometheus + Grafana (+ optional Datadog APM)
+
+Secrets: AWS Secrets Manager + KMS
+
+Notifications: Slack/Email (SNS → Slack webhook)
+
+
+org/
+├─ app/                        # application source (e.g., Node/Go/Java)
+│  ├─ Dockerfile
+│  └─ k8s/ (local dev only)
+├─ infra/                      # Terraform mono-repo
+│  ├─ modules/ (vpc, eks, rds, ecr, alb, iam, s3_logs)
+│  └─ envs/
+│     ├─ dev/
+│     ├─ stage/
+│     └─ prod/
+├─ ops/                        # Ops config & bootstraps
+│  ├─ ansible/
+│  ├─ observability/ (prom, grafana, dashboards)
+│  └─ logging/ (fluent-bit)
+└─ gitops/                     # Argo CD apps & Helm charts
+   ├─ charts/myapp/
+   │  ├─ templates/
+   │  ├─ values.yaml
+   │  ├─ values-dev.yaml
+   │  ├─ values-stage.yaml
+   │  └─ values-prod.yaml
+   └─ apps/ (Argo CD Application manifests per env)
